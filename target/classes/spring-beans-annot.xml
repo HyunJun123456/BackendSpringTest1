@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<!-- 여기서는 beans가 default값이라서 안써도 되는거임 (변경도 가능함) -->
+
+	
+	<!-- namespace가 다르면 태그명이 겹쳐도 괜찮게 하기 위해서 -->
+	<!-- namespace의 개념이 없으면 내가 쓰는 id를 쓸 수가 없음 -->
+	<context:component-scan base-package="myspring.di.annot"/>
+	
+</beans>

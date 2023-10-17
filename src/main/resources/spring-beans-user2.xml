@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- 프로퍼티 설정 -->
+	<context:property-placeholder
+		location="classpath:value.properties" />
+
+	<!-- dataSource 구현체인 HikariDataSource SpringBean으로 등록 -->
+	<!-- ${} el 표기법 -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		p:driverClassName="${db.driverClass}" p:jdbcUrl="${db.url}"
+		p:username="${db.username}" p:password="${db.password}" />
+
+	<!-- MyBatis-Spring을 SqlSessionFactoryBean을 SpringBean에 등록 -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation"
+			value="classpath:mybatis/SqlMapConfig.xml" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:mybatis/UserMapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 기본 생성자가 없으니깐 생성자를 만들어주라는 에러를 반환 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	
+	<!-- sqlSession을 의존받아서 찾아오는거였음! -->
+	<!-- MapperScannerConfiguer를 스프링 bean으로 등록 -->
+	<!-- MapperScannerConfigurer 빈을 등록하는 것은 MyBatis 매퍼 인터페이스를 자동으로 스캔하고 Spring 컨텍스트에 등록하는 데 필요합니다. -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="myspring.user.dao.mapper" />
+		<property name="sqlSessionTemplateBeanName" value="sqlSession" />
+	</bean>
+	
+	<!-- DAO, Service에 해당하는 빈을 스캔 -->
+	<!-- 상위로 올려서 하는 것도 가능 -->
+	<!-- Presentation Layer는 제외 시켜야함 (Service, DAO가 있는 레이어를 분리하기 위해서) -->
+	<context:component-scan base-package="myspring.user"> 
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+</beans>
